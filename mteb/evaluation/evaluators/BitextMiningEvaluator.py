@@ -35,23 +35,28 @@ class BitextMiningEvaluator(Evaluator):
 
         # Find nearest neighbors
         logger.info("Finding nearest neighbors...")
-        nearest_neighbors = self._similarity_search(embeddings1, embeddings2, top_k=1)
 
-        # Compute errors
-        logger.info("Computing metrics...")
-        labels = []
-        predictions = []
-        for i, x in enumerate(nearest_neighbors):
-            j = x[0]["corpus_id"]
-            predictions.append(j)
-            labels.append(self.gold[i][1])
+        final_scores = []
 
-        scores = {
-            "precision": precision_score(labels, predictions, average="weighted"),
-            "recall": recall_score(labels, predictions, average="weighted"),
-            "f1": f1_score(labels, predictions, average="weighted"),
-            "accuracy": accuracy_score(labels, predictions),
-        }
+        for emb_a, emb_b in [(embeddings1, embeddings2,), (embeddings2, embeddings1,)]:
+            nearest_neighbors = self._similarity_search(emb_a, emb_b, top_k=1)
+            # Compute errors
+            logger.info("Computing metrics...")
+            labels = []
+            predictions = []
+            for i, x in enumerate(nearest_neighbors):
+                j = x[0]["corpus_id"]
+                predictions.append(j)
+                labels.append(self.gold[i][1])
+
+            scores = {
+                "precision": precision_score(labels, predictions, average="weighted"),
+                "recall": recall_score(labels, predictions, average="weighted"),
+                "f1": f1_score(labels, predictions, average="weighted"),
+                "accuracy": accuracy_score(labels, predictions),
+            }
+            final_scores.append(scores)
+            print("GOT SCORES", scores)
         return scores
 
     def _similarity_search(
