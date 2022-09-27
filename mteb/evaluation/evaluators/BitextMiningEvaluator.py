@@ -38,7 +38,7 @@ class BitextMiningEvaluator(Evaluator):
 
         final_scores = []
 
-        for emb_a, emb_b in [(embeddings1, embeddings2,), (embeddings2, embeddings1,)]:
+        for (emb_a, emb_b) in [(embeddings1, embeddings2), (embeddings2, embeddings1)]:
             nearest_neighbors = self._similarity_search(emb_a, emb_b, top_k=1)
             # Compute errors
             logger.info("Computing metrics...")
